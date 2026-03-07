@@ -1,11 +1,16 @@
 // javascript
 import p5 from 'p5';
+import ml5 from 'ml5';
 
 const sketch = (p) => {
 	
 	let raindrops = [];
 	let gravity;
 	let wind;
+	
+	let handPose;
+	let video;
+	let hands = [];
 	
 	class Raindrop {
 		constructor() {
@@ -47,8 +52,30 @@ const sketch = (p) => {
 		}
 	}
 	
-	p.setup = () => {
+	function modelLoaded() {
+		console.log("Model loaded!");
+	}
+	
+	function gotHands(results) {
+		hands = results;
+	}
+	
+	// p.preload = () => {
+	// 	console.log("here")
+	// }
+	
+	p.setup = async() => {
 		p.createCanvas(p.windowWidth, p.windowHeight);
+		handPose = ml5.handPose();
+		video = p.createCapture(p.VIDEO);
+		video.size(p.width, p.height);
+		// video.hide(); // Hide the extra video element
+		
+		handPose = await ml5.handPose(video, modelLoaded);
+		await handPose.detectStart(video, gotHands);
+		// Listen for new hand detection results
+		// handpose.on("hand", gotHands);
+		
 		for (let i = 0; i < 500; i++) {
 			raindrops[i] = new Raindrop();
 		}
@@ -65,7 +92,16 @@ const sketch = (p) => {
 			raindrops[i].update();
 			raindrops[i].show();
 		}
-
+		
+		for (let i = 0; i < hands.length; i++) {
+			let hand = hands[i];
+			for (let j = 0; j < hand.keypoints.length; j++) {
+				let keypoint = hand.keypoints[j];
+				fill(0, 255, 0);
+				noStroke();
+				circle(keypoint.x, keypoint.y, 10);
+			}
+		}
 	};
 	
 	p.windowResized = () => {
