@@ -27,7 +27,8 @@ const sketch = (p) => {
             // Window is taller than 16:9 — letterbox
             vw = p.width;
             vh = vw / aspect;
-        }vx = (p.width - vw) / 2;
+        }
+		vx = (p.width - vw) / 2;
         vy = (p.height - vh) / 2;
     }
 
@@ -59,7 +60,7 @@ const sketch = (p) => {
             p.rect(this.location.x, this.location.y, scaledSize, scaledSize);
         }
 
-        update() {
+        move() {
             let noiseScale = 0.01;
             this.nx = p.noise(this.location.x * noiseScale, this.location.y * noiseScale, this.age * 0.01);
             this.ny = p.noise(this.location.x * noiseScale + 1000, this.location.y * noiseScale + 1000, this.age * 0.01);
@@ -187,7 +188,7 @@ const sketch = (p) => {
 
         // Update and show particles
         for (let i = raindrops.length - 1; i >= 0; i--) {
-            raindrops[i].update();
+            raindrops[i].move();
             raindrops[i].show();
             if (!raindrops[i].alive) {
                 raindrops.splice(i, 1);
